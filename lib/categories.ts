@@ -13,30 +13,39 @@ export interface SubCategory {
 // 카테고리 데이터
 export const categories: Category[] = [
   {
-    id: 'infrastructure',
-    name: '인프라',
+    id: "infrastructure",
+    name: "인프라",
     subcategories: [
-      { id: 'aws', name: 'AWS' },
+      { id: "aws", name: "AWS" },
+      { id: "n8n", name: "n8n" },
     ],
   },
   {
-    id: 'database',
-    name: '데이터베이스',
+    id: "database",
+    name: "데이터베이스",
+    subcategories: [{ id: "mysql", name: "MySQL" }],
+  },
+  {
+    id: "backend",
+    name: "백엔드",
     subcategories: [
-      { id: 'mysql', name: 'MySQL' },
+      { id: "spring-boot", name: "스프링부트" },
+      { id: "fastapi", name: "FastAPI" },
     ],
   },
   {
-    id: 'backend',
-    name: '백엔드',
+    id: "frontend",
+    name: "프런트엔드",
     subcategories: [
-      { id: 'spring-boot', name: '스프링부트' },
-      { id: 'fastapi', name: 'FastAPI' },
+      { id: "nextjs", name: "Next.js" },
+      { id: "react-native", name: "React Native" },
+      { id: "android", name: "Android" },
     ],
   },
   {
-    id: 'frontend',
-    name: '프런트엔드',
+    id: "book-review",
+    name: "책 리뷰",
+    subcategories: [{ id: "development-book", name: "개발책" }],
   },
 ];
 
@@ -46,7 +55,10 @@ export function getCategoryById(id: string): Category | undefined {
 }
 
 // 서브카테고리 ID로 서브카테고리 찾기
-export function getSubCategoryById(categoryId: string, subCategoryId: string): SubCategory | undefined {
+export function getSubCategoryById(
+  categoryId: string,
+  subCategoryId: string
+): SubCategory | undefined {
   const category = getCategoryById(categoryId);
   return category?.subcategories?.find((sub) => sub.id === subCategoryId);
 }
@@ -63,15 +75,17 @@ export function getSubCategoryIds(categoryId: string): string[] {
 }
 
 // 카테고리 경로 생성 (예: "인프라/AWS")
-export function getCategoryPath(categoryId: string, subCategoryId?: string): string {
+export function getCategoryPath(
+  categoryId: string,
+  subCategoryId?: string
+): string {
   const category = getCategoryById(categoryId);
-  if (!category) return '';
-  
+  if (!category) return "";
+
   if (subCategoryId) {
     const subCategory = getSubCategoryById(categoryId, subCategoryId);
     return subCategory ? `${category.name}/${subCategory.name}` : category.name;
   }
-  
+
   return category.name;
 }
-

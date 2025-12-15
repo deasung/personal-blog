@@ -68,10 +68,10 @@ async def read_async():
 ## 자동 API 문서
 
 FastAPI는 자동으로 Swagger UI와 ReDoc 문서를 생성합니다:
+
 - `/docs` - Swagger UI
 - `/redoc` - ReDoc
 
 ## 마무리
 
 FastAPI는 빠르고 현대적인 Python 백엔드 개발을 위한 훌륭한 선택입니다.
-

@@ -1,19 +1,19 @@
-import { Metadata } from 'next';
-import { getAllPosts } from '@/lib/posts';
-import PostCard from '@/app/components/PostCard';
-import Header from '@/app/components/Header';
-import CategoryNav from '@/app/components/CategoryNav';
-import { siteConfig } from '@/lib/site';
+import { Metadata } from "next";
+import { getAllPosts } from "@/lib/posts";
+import PostCard from "@/app/components/PostCard";
+import Header from "@/app/components/Header";
+import CategoryNav from "@/app/components/CategoryNav";
+import { siteConfig } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: '모든 포스트',
-  description: '개발과 취미에 관한 모든 글들을 확인하세요.',
+  title: "모든 포스트",
+  description: "개발과 취미에 관한 모든 글들을 확인하세요.",
   openGraph: {
-    title: '모든 포스트',
-    description: '개발과 취미에 관한 모든 글들을 확인하세요.',
+    title: "모든 포스트",
+    description: "개발과 취미에 관한 모든 글들을 확인하세요.",
     url: `${siteConfig.url}/posts`,
     siteName: siteConfig.name,
-    type: 'website',
+    type: "website",
   },
   alternates: {
     canonical: `${siteConfig.url}/posts`,
@@ -54,7 +54,11 @@ export default function PostsPage() {
             ) : (
               <div className="grid gap-6 md:grid-cols-2">
                 {posts.map((post) => (
-                  <PostCard key={post.slug} slug={post.slug} metadata={post.metadata} />
+                  <PostCard
+                    key={post.slug}
+                    slug={post.slug}
+                    metadata={post.metadata}
+                  />
                 ))}
               </div>
             )}
@@ -64,5 +68,3 @@ export default function PostsPage() {
     </>
   );
 }
-
-

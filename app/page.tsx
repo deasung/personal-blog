@@ -1,8 +1,8 @@
-import { Metadata } from 'next';
-import { getAllPosts } from '@/lib/posts';
-import PostCard from '@/app/components/PostCard';
-import Header from '@/app/components/Header';
-import { siteConfig } from '@/lib/site';
+import { Metadata } from "next";
+import { getAllPosts } from "@/lib/posts";
+import PostCard from "@/app/components/PostCard";
+import Header from "@/app/components/Header";
+import { siteConfig } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: {
@@ -15,10 +15,10 @@ export const metadata: Metadata = {
     description: siteConfig.description,
     url: siteConfig.url,
     siteName: siteConfig.name,
-    type: 'website',
+    type: "website",
   },
   twitter: {
-    card: 'summary_large_image',
+    card: "summary_large_image",
     title: siteConfig.name,
     description: siteConfig.description,
   },
@@ -32,30 +32,30 @@ export default function Home() {
 
   // 구조화된 데이터 (JSON-LD) - 웹사이트
   const websiteJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'WebSite',
+    "@context": "https://schema.org",
+    "@type": "WebSite",
     name: siteConfig.name,
     description: siteConfig.description,
     url: siteConfig.url,
     potentialAction: {
-      '@type': 'SearchAction',
+      "@type": "SearchAction",
       target: {
-        '@type': 'EntryPoint',
+        "@type": "EntryPoint",
         urlTemplate: `${siteConfig.url}/posts?search={search_term_string}`,
       },
-      'query-input': 'required name=search_term_string',
+      "query-input": "required name=search_term_string",
     },
   };
 
   // 구조화된 데이터 (JSON-LD) - 블로그
   const blogJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'Blog',
+    "@context": "https://schema.org",
+    "@type": "Blog",
     name: siteConfig.name,
     description: siteConfig.description,
     url: siteConfig.url,
     publisher: {
-      '@type': 'Person',
+      "@type": "Person",
       name: siteConfig.name,
     },
   };
@@ -73,9 +73,9 @@ export default function Home() {
       <Header />
       <main className="mx-auto min-h-screen max-w-4xl px-4 py-12">
         <section className="mb-16 text-center">
-          <h1 className="mb-4 text-5xl font-bold text-gray-900 dark:text-gray-100">
-            개발 블로그
-          </h1>
+          {/*<h1 className="mb-4 text-5xl font-bold text-gray-900 dark:text-gray-100">*/}
+          {/*  열심히..살아남자*/}
+          {/*</h1>*/}
           <p className="text-xl text-gray-600 dark:text-gray-400">
             개발과 취미에 관한 이야기를 나누는 공간입니다.
           </p>
@@ -99,7 +99,11 @@ export default function Home() {
             <>
               <div className="grid gap-6 md:grid-cols-2">
                 {posts.map((post) => (
-                  <PostCard key={post.slug} slug={post.slug} metadata={post.metadata} />
+                  <PostCard
+                    key={post.slug}
+                    slug={post.slug}
+                    metadata={post.metadata}
+                  />
                 ))}
               </div>
               {getAllPosts().length > 6 && (

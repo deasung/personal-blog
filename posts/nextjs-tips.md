@@ -15,7 +15,7 @@ Next.js를 사용하면서 알게 된 유용한 팁들을 공유합니다.
 Next.js의 `Image` 컴포넌트를 사용하면 자동으로 이미지 최적화가 됩니다.
 
 ```tsx
-import Image from 'next/image';
+import Image from "next/image";
 
 <Image
   src="/example.jpg"
@@ -23,7 +23,7 @@ import Image from 'next/image';
   width={800}
   height={600}
   priority // 중요 이미지의 경우
-/>
+/>;
 ```
 
 ## 2. 동적 라우팅
@@ -43,8 +43,8 @@ app/
 
 ```tsx
 export const metadata = {
-  title: '포스트 제목',
-  description: '포스트 설명',
+  title: "포스트 제목",
+  description: "포스트 설명",
 };
 ```
 
@@ -55,5 +55,3 @@ Next.js 13+에서는 기본적으로 서버 컴포넌트를 사용하므로, 클
 ## 마무리
 
 이런 팁들이 Next.js 개발에 도움이 되길 바랍니다!
-
-

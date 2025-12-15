@@ -41,12 +41,12 @@ public class Application {
 @RestController
 @RequestMapping("/api")
 public class UserController {
-    
+
     @GetMapping("/users")
     public List<User> getUsers() {
         return userService.findAll();
     }
-    
+
     @PostMapping("/users")
     public User createUser(@RequestBody User user) {
         return userService.save(user);
@@ -59,10 +59,10 @@ public class UserController {
 ```java
 @Service
 public class UserService {
-    
+
     @Autowired
     private UserRepository userRepository;
-    
+
     public List<User> findAll() {
         return userRepository.findAll();
     }
@@ -72,4 +72,3 @@ public class UserService {
 ## 마무리
 
 Spring Boot는 빠르고 효율적인 백엔드 개발을 가능하게 해줍니다.
-

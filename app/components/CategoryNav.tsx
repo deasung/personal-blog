@@ -1,13 +1,15 @@
-import Link from 'next/link';
-import { categories } from '@/lib/categories';
-import { getCategoryPostCounts } from '@/lib/posts';
+import Link from "next/link";
+import { categories } from "@/lib/categories";
+import { getCategoryPostCounts } from "@/lib/posts";
 
 export default function CategoryNav() {
   const counts = getCategoryPostCounts();
 
   return (
     <nav className="mb-8">
-      <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">카테고리</h2>
+      <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">
+        카테고리
+      </h2>
       <ul className="space-y-2">
         {categories.map((category) => (
           <li key={category.id}>
@@ -50,4 +52,3 @@ export default function CategoryNav() {
     </nav>
   );
 }
-

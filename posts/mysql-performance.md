@@ -26,6 +26,7 @@ CREATE INDEX idx_user_name_email ON users(name, email);
 ## 쿼리 최적화
 
 ### EXPLAIN 사용
+
 쿼리 실행 계획을 확인하여 최적화할 수 있습니다.
 
 ```sql
@@ -33,6 +34,7 @@ EXPLAIN SELECT * FROM users WHERE email = 'user@example.com';
 ```
 
 ### JOIN 최적화
+
 적절한 JOIN 순서와 인덱스를 사용하면 성능이 향상됩니다.
 
 ## 설정 최적화
@@ -53,4 +55,3 @@ query_cache_size = 64M
 ## 마무리
 
 MySQL 성능 최적화는 지속적인 모니터링과 튜닝이 필요합니다.
-

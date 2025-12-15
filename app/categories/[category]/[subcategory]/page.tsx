@@ -1,20 +1,24 @@
-import { Metadata } from 'next';
-import { notFound } from 'next/navigation';
-import { getPostsByCategory } from '@/lib/posts';
-import { getCategoryById, getSubCategoryById, getCategoryPath } from '@/lib/categories';
-import { siteConfig } from '@/lib/site';
-import PostCard from '@/app/components/PostCard';
-import Header from '@/app/components/Header';
-import Link from 'next/link';
+import { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { getPostsByCategory } from "@/lib/posts";
+import {
+  getCategoryById,
+  getSubCategoryById,
+  getCategoryPath,
+} from "@/lib/categories";
+import { siteConfig } from "@/lib/site";
+import PostCard from "@/app/components/PostCard";
+import Header from "@/app/components/Header";
+import Link from "next/link";
 
 interface SubCategoryPageProps {
   params: Promise<{ category: string; subcategory: string }>;
 }
 
 export async function generateStaticParams() {
-  const { categories } = await import('@/lib/categories');
+  const { categories } = await import("@/lib/categories");
   const params: { category: string; subcategory: string }[] = [];
-  
+
   categories.forEach((category) => {
     if (category.subcategories) {
       category.subcategories.forEach((subcategory) => {
@@ -25,18 +29,20 @@ export async function generateStaticParams() {
       });
     }
   });
-  
+
   return params;
 }
 
-export async function generateMetadata({ params }: SubCategoryPageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: SubCategoryPageProps): Promise<Metadata> {
   const { category, subcategory } = await params;
   const categoryData = getCategoryById(category);
   const subCategoryData = getSubCategoryById(category, subcategory);
 
   if (!categoryData || !subCategoryData) {
     return {
-      title: '카테고리를 찾을 수 없습니다',
+      title: "카테고리를 찾을 수 없습니다",
     };
   }
 
@@ -52,7 +58,7 @@ export async function generateMetadata({ params }: SubCategoryPageProps): Promis
       description,
       url: `${siteConfig.url}/categories/${category}/${subcategory}`,
       siteName: siteConfig.name,
-      type: 'website',
+      type: "website",
     },
     alternates: {
       canonical: `${siteConfig.url}/categories/${category}/${subcategory}`,
@@ -60,7 +66,9 @@ export async function generateMetadata({ params }: SubCategoryPageProps): Promis
   };
 }
 
-export default async function SubCategoryPage({ params }: SubCategoryPageProps) {
+export default async function SubCategoryPage({
+  params,
+}: SubCategoryPageProps) {
   const { category, subcategory } = await params;
   const categoryData = getCategoryById(category);
   const subCategoryData = getSubCategoryById(category, subcategory);
@@ -103,7 +111,11 @@ export default async function SubCategoryPage({ params }: SubCategoryPageProps) 
         ) : (
           <div className="grid gap-6 md:grid-cols-2">
             {posts.map((post) => (
-              <PostCard key={post.slug} slug={post.slug} metadata={post.metadata} />
+              <PostCard
+                key={post.slug}
+                slug={post.slug}
+                metadata={post.metadata}
+              />
             ))}
           </div>
         )}
@@ -111,4 +123,3 @@ export default async function SubCategoryPage({ params }: SubCategoryPageProps) 
     </>
   );
 }
-

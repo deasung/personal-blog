@@ -14,6 +14,7 @@ Amazon Web Services(AWS)는 세계적으로 널리 사용되는 클라우드 컴
 ## 주요 서비스
 
 ### EC2 (Elastic Compute Cloud)
+
 가상 서버를 제공하는 서비스입니다.
 
 ```bash
@@ -25,9 +26,11 @@ aws ec2 run-instances \
 ```
 
 ### S3 (Simple Storage Service)
+
 객체 스토리지 서비스로, 파일을 저장하고 관리할 수 있습니다.
 
 ### RDS (Relational Database Service)
+
 관계형 데이터베이스를 쉽게 관리할 수 있는 서비스입니다.
 
 ## 시작하기
@@ -39,4 +42,3 @@ aws ec2 run-instances \
 ## 마무리
 
 AWS는 다양한 서비스를 제공하여 인프라 구축을 쉽게 만들어줍니다.
-

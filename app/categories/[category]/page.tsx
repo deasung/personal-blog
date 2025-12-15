@@ -1,30 +1,32 @@
-import { Metadata } from 'next';
-import { notFound } from 'next/navigation';
-import { getAllPosts, getPostsByCategory } from '@/lib/posts';
-import { getCategoryById, getCategoryPath } from '@/lib/categories';
-import { siteConfig } from '@/lib/site';
-import PostCard from '@/app/components/PostCard';
-import Header from '@/app/components/Header';
-import Link from 'next/link';
+import { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { getAllPosts, getPostsByCategory } from "@/lib/posts";
+import { getCategoryById, getCategoryPath } from "@/lib/categories";
+import { siteConfig } from "@/lib/site";
+import PostCard from "@/app/components/PostCard";
+import Header from "@/app/components/Header";
+import Link from "next/link";
 
 interface CategoryPageProps {
   params: Promise<{ category: string }>;
 }
 
 export async function generateStaticParams() {
-  const { getAllCategoryIds } = await import('@/lib/categories');
+  const { getAllCategoryIds } = await import("@/lib/categories");
   return getAllCategoryIds().map((categoryId) => ({
     category: categoryId,
   }));
 }
 
-export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: CategoryPageProps): Promise<Metadata> {
   const { category } = await params;
   const categoryData = getCategoryById(category);
 
   if (!categoryData) {
     return {
-      title: '카테고리를 찾을 수 없습니다',
+      title: "카테고리를 찾을 수 없습니다",
     };
   }
 
@@ -39,7 +41,7 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
       description,
       url: `${siteConfig.url}/categories/${category}`,
       siteName: siteConfig.name,
-      type: 'website',
+      type: "website",
     },
     alternates: {
       canonical: `${siteConfig.url}/categories/${category}`,
@@ -86,7 +88,11 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
         ) : (
           <div className="grid gap-6 md:grid-cols-2">
             {posts.map((post) => (
-              <PostCard key={post.slug} slug={post.slug} metadata={post.metadata} />
+              <PostCard
+                key={post.slug}
+                slug={post.slug}
+                metadata={post.metadata}
+              />
             ))}
           </div>
         )}
@@ -94,4 +100,3 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
     </>
   );
 }
-

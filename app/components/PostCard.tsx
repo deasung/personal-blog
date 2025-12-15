@@ -1,8 +1,12 @@
-import Link from 'next/link';
-import { format } from 'date-fns';
-import { ko } from 'date-fns/locale';
-import { PostMetadata } from '@/lib/posts';
-import { getCategoryById, getSubCategoryById, getCategoryPath } from '@/lib/categories';
+import Link from "next/link";
+import { format } from "date-fns";
+import { ko } from "date-fns/locale";
+import { PostMetadata } from "@/lib/posts";
+import {
+  getCategoryById,
+  getSubCategoryById,
+  getCategoryPath,
+} from "@/lib/categories";
 
 interface PostCardProps {
   slug: string;
@@ -13,25 +17,28 @@ export default function PostCard({ slug, metadata }: PostCardProps) {
   // ISO 8601 형식의 날짜를 사용하여 서버/클라이언트 일관성 보장
   // metadata.date는 이미 ISO 형식으로 정규화되어 있음
   const isoDate = metadata.date;
-  
+
   // 날짜 포맷팅 - 서버/클라이언트 일관성을 위해 ISO 문자열을 직접 파싱
   // ISO 형식이므로 UTC 기준으로 파싱되어 일관성 보장
   const dateObj = new Date(isoDate);
-  
+
   // 유효한 날짜인지 확인
   if (isNaN(dateObj.getTime())) {
-    console.error('Invalid date:', metadata.date);
+    console.error("Invalid date:", metadata.date);
   }
-  
-  const formattedDate = format(dateObj, 'yyyy년 M월 d일', {
+
+  const formattedDate = format(dateObj, "yyyy년 M월 d일", {
     locale: ko,
   });
 
   // 카테고리 정보 가져오기
-  const categoryData = metadata.category ? getCategoryById(metadata.category) : null;
-  const subCategoryData = metadata.category && metadata.subcategory
-    ? getSubCategoryById(metadata.category, metadata.subcategory)
+  const categoryData = metadata.category
+    ? getCategoryById(metadata.category)
     : null;
+  const subCategoryData =
+    metadata.category && metadata.subcategory
+      ? getSubCategoryById(metadata.category, metadata.subcategory)
+      : null;
   const categoryPath = metadata.category
     ? getCategoryPath(metadata.category, metadata.subcategory)
     : null;
@@ -53,7 +60,10 @@ export default function PostCard({ slug, metadata }: PostCardProps) {
               {categoryPath}
             </span>
           )}
-          <time dateTime={isoDate} className="text-sm text-gray-500 dark:text-gray-400">
+          <time
+            dateTime={isoDate}
+            className="text-sm text-gray-500 dark:text-gray-400"
+          >
             {formattedDate}
           </time>
         </div>
@@ -81,5 +91,3 @@ export default function PostCard({ slug, metadata }: PostCardProps) {
     </article>
   );
 }
-
-

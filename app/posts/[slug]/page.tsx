@@ -1,11 +1,15 @@
-import { notFound } from 'next/navigation';
-import { Metadata } from 'next';
-import { getAllPosts, getPostBySlug, getPostContentWithHtml } from '@/lib/posts';
-import { format } from 'date-fns';
-import { ko } from 'date-fns/locale';
-import Header from '@/app/components/Header';
-import Link from 'next/link';
-import { siteConfig } from '@/lib/site';
+import { notFound } from "next/navigation";
+import { Metadata } from "next";
+import {
+  getAllPosts,
+  getPostBySlug,
+  getPostContentWithHtml,
+} from "@/lib/posts";
+import { format } from "date-fns";
+import { ko } from "date-fns/locale";
+import Header from "@/app/components/Header";
+import Link from "next/link";
+import { siteConfig } from "@/lib/site";
 
 interface PostPageProps {
   params: Promise<{ slug: string }>;
@@ -18,13 +22,15 @@ export async function generateStaticParams() {
   }));
 }
 
-export async function generateMetadata({ params }: PostPageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: PostPageProps): Promise<Metadata> {
   const { slug } = await params;
   const post = getPostBySlug(slug);
 
   if (!post) {
     return {
-      title: '포스트를 찾을 수 없습니다',
+      title: "포스트를 찾을 수 없습니다",
     };
   }
 
@@ -44,17 +50,17 @@ export async function generateMetadata({ params }: PostPageProps): Promise<Metad
       description,
       url,
       siteName: siteConfig.name,
-      type: 'article',
+      type: "article",
       publishedTime,
       authors: [siteConfig.name],
       tags: post.metadata.tags,
     },
     twitter: {
-      card: 'summary_large_image',
+      card: "summary_large_image",
       title,
       description,
     },
-    keywords: post.metadata.tags?.join(', '),
+    keywords: post.metadata.tags?.join(", "),
   };
 }
 
@@ -68,33 +74,33 @@ export default async function PostPage({ params }: PostPageProps) {
 
   const content = await getPostContentWithHtml(post);
   const dateObj = new Date(post.metadata.date);
-  const formattedDate = format(dateObj, 'yyyy년 M월 d일', {
+  const formattedDate = format(dateObj, "yyyy년 M월 d일", {
     locale: ko,
   });
 
   // 구조화된 데이터 (JSON-LD)
   const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'BlogPosting',
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
     headline: post.metadata.title,
-    description: post.metadata.description || '',
+    description: post.metadata.description || "",
     image: `${siteConfig.url}/og-image.png`,
     datePublished: post.metadata.date,
     dateModified: post.metadata.date,
     author: {
-      '@type': 'Person',
+      "@type": "Person",
       name: siteConfig.name,
     },
     publisher: {
-      '@type': 'Organization',
+      "@type": "Organization",
       name: siteConfig.name,
     },
     mainEntityOfPage: {
-      '@type': 'WebPage',
-      '@id': `${siteConfig.url}/posts/${slug}`,
+      "@type": "WebPage",
+      "@id": `${siteConfig.url}/posts/${slug}`,
     },
-    keywords: post.metadata.tags?.join(', ') || '',
-    articleSection: post.metadata.category || '',
+    keywords: post.metadata.tags?.join(", ") || "",
+    articleSection: post.metadata.category || "",
   };
 
   return (
@@ -119,7 +125,10 @@ export default async function PostPage({ params }: PostPageProps) {
                 {post.metadata.category}
               </span>
             )}
-            <time dateTime={post.metadata.date} className="text-sm text-gray-500 dark:text-gray-400">
+            <time
+              dateTime={post.metadata.date}
+              className="text-sm text-gray-500 dark:text-gray-400"
+            >
               {formattedDate}
             </time>
           </div>
@@ -156,5 +165,3 @@ export default async function PostPage({ params }: PostPageProps) {
     </>
   );
 }
-
-

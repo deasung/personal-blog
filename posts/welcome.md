@@ -29,13 +29,13 @@ function greet(name: string): string {
   return `안녕하세요, ${name}님!`;
 }
 
-console.log(greet('방문자'));
+console.log(greet("방문자"));
 ```
 
 ```javascript
 // JavaScript 예시
 const posts = getAllPosts();
-posts.forEach(post => {
+posts.forEach((post) => {
   console.log(post.metadata.title);
 });
 ```
@@ -47,5 +47,3 @@ posts.forEach(post => {
 - 취미 관련 콘텐츠 추가
 
 감사합니다! 🚀
-
-

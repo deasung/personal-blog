@@ -12,7 +12,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-import { siteConfig } from '@/lib/site';
+import { siteConfig } from "@/lib/site";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
@@ -21,19 +21,19 @@ export const metadata: Metadata = {
     template: `%s | ${siteConfig.name}`,
   },
   description: siteConfig.description,
-  keywords: ['개발', '블로그', '프로그래밍', 'Next.js', 'React', '웹개발'],
+  keywords: ["개발", "블로그", "프로그래밍", "Next.js", "React", "웹개발"],
   authors: [{ name: siteConfig.name }],
   creator: siteConfig.name,
   openGraph: {
-    type: 'website',
-    locale: 'ko_KR',
+    type: "website",
+    locale: "ko_KR",
     url: siteConfig.url,
     title: siteConfig.name,
     description: siteConfig.description,
     siteName: siteConfig.name,
   },
   twitter: {
-    card: 'summary_large_image',
+    card: "summary_large_image",
     title: siteConfig.name,
     description: siteConfig.description,
   },
@@ -43,9 +43,9 @@ export const metadata: Metadata = {
     googleBot: {
       index: true,
       follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
     },
   },
 };
