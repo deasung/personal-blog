@@ -1,9 +1,22 @@
 import Link from "next/link";
 import { categories } from "@/lib/categories";
-import { getCategoryPostCounts } from "@/lib/posts";
+import { publicApi } from "@/lib/api-client";
 
-export default function CategoryNav() {
-  const counts = getCategoryPostCounts();
+export default async function CategoryNav() {
+  let categoryCounts: Record<string, number> = {};
+
+  try {
+    const categoriesResponse = await publicApi.getCategories();
+    if (categoriesResponse.success && categoriesResponse.data) {
+      // 카테고리별 포스트 개수는 실제로는 API에서 가져와야 함
+      // 임시로 카테고리 목록만 표시
+      categoriesResponse.data.forEach((cat) => {
+        categoryCounts[cat.slug] = 0; // TODO: API에서 포스트 개수 가져오기
+      });
+    }
+  } catch (error) {
+    console.error("Failed to fetch categories:", error);
+  }
 
   return (
     <nav className="mb-8">

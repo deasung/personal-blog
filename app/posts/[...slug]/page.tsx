@@ -1,25 +1,33 @@
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
-import {
-  getAllPosts,
-  getPostBySlug,
-  getPostContentWithHtml,
-} from "@/lib/posts";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
 import Header from "@/app/components/Header";
 import Link from "next/link";
 import { siteConfig } from "@/lib/site";
+import { publicApi } from "@/lib/api-client";
+import { remark } from "remark";
+import remarkRehype from "remark-rehype";
+import rehypeStringify from "rehype-stringify";
+import rehypeHighlight from "rehype-highlight";
 
 interface PostPageProps {
   params: Promise<{ slug: string[] }>;
 }
 
 export async function generateStaticParams() {
-  const posts = getAllPosts();
-  return posts.map((post) => ({
-    slug: post.slug.split("/"),
-  }));
+  // API에서 모든 포스트 slug 가져오기
+  try {
+    const response = await publicApi.getPosts({ limit: 1000 });
+    if (response.success && response.data) {
+      return response.data.map((post) => ({
+        slug: post.slug.split("/"),
+      }));
+    }
+  } catch (error) {
+    console.error("Failed to fetch posts for static params:", error);
+  }
+  return [];
 }
 
 export async function generateMetadata({
@@ -27,7 +35,23 @@ export async function generateMetadata({
 }: PostPageProps): Promise<Metadata> {
   const { slug } = await params;
   const slugString = Array.isArray(slug) ? slug.join("/") : slug;
-  const post = getPostBySlug(slugString);
+
+  let post: {
+    title: string;
+    excerpt: string;
+    publishedAt: string;
+    tags: Array<{ name: string }>;
+    categorySlug?: string;
+  } | null = null;
+
+  try {
+    const response = await publicApi.getPostBySlug(slugString);
+    if (response.success && response.data) {
+      post = response.data;
+    }
+  } catch (error) {
+    console.error("Failed to fetch post:", error);
+  }
 
   if (!post) {
     return {
@@ -35,10 +59,13 @@ export async function generateMetadata({
     };
   }
 
-  const title = `${post.metadata.title} | ${siteConfig.name}`;
-  const description = post.metadata.description || siteConfig.description;
+  const title = `${post.title} | ${siteConfig.name}`;
+  const description = post.excerpt || siteConfig.description;
   const url = `${siteConfig.url}/posts/${slugString}`;
-  const publishedTime = new Date(post.metadata.date).toISOString();
+  const publishedTime = new Date(post.publishedAt).toISOString();
+
+  // Open Graph 이미지 URL 생성 (포스트에 이미지가 있으면 사용, 없으면 기본 이미지)
+  const ogImage = `${siteConfig.url}${siteConfig.ogImage}`;
 
   return {
     title,
@@ -54,55 +81,158 @@ export async function generateMetadata({
       type: "article",
       publishedTime,
       authors: [siteConfig.name],
-      tags: post.metadata.tags,
+      tags: post.tags.map((tag) => tag.name),
+      images: [
+        {
+          url: ogImage,
+          width: 1200,
+          height: 630,
+          alt: post.title,
+        },
+      ],
+      locale: "ko_KR",
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
+      images: [ogImage],
     },
-    keywords: post.metadata.tags?.join(", "),
+    keywords: post.tags.map((tag) => tag.name).join(", "),
+    authors: [{ name: siteConfig.name }],
+    creator: siteConfig.name,
+    publisher: siteConfig.name,
   };
+}
+
+async function markdownToHtml(content: string): Promise<string> {
+  const processedContent = await remark()
+    .use(remarkRehype, { allowDangerousHtml: true })
+    .use(rehypeHighlight)
+    .use(rehypeStringify, { allowDangerousHtml: true })
+    .process(content);
+
+  return processedContent.toString();
 }
 
 export default async function PostPage({ params }: PostPageProps) {
   const { slug } = await params;
   const slugString = Array.isArray(slug) ? slug.join("/") : slug;
-  const post = getPostBySlug(slugString);
+
+  let post: {
+    id: string;
+    title: string;
+    content: string;
+    excerpt: string;
+    slug: string;
+    publishedAt: string;
+    categoryName: string;
+    categorySlug: string;
+    tags: Array<{ id: string; name: string; slug: string }>;
+  } | null = null;
+  let apiError: string | null = null;
+
+  try {
+    const response = await publicApi.getPostBySlug(slugString);
+    if (response.success && response.data) {
+      post = response.data;
+    }
+  } catch (error) {
+    console.error("Failed to fetch post:", error);
+    apiError =
+      error instanceof Error ? error.message : "API 서버에 연결할 수 없습니다.";
+  }
 
   if (!post) {
+    if (apiError) {
+      // API 에러인 경우 에러 페이지 표시
+      return (
+        <>
+          <Header />
+          <main className="mx-auto min-h-screen max-w-4xl px-4 py-12">
+            <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-6 dark:border-yellow-800 dark:bg-yellow-900/20">
+              <p className="text-yellow-800 dark:text-yellow-200">
+                ⚠️ {apiError}
+              </p>
+              <p className="mt-2 text-sm text-yellow-700 dark:text-yellow-300">
+                API 서버가 실행 중인지 확인하고,{" "}
+                <code className="rounded bg-yellow-100 px-1 py-0.5 text-xs dark:bg-yellow-900">
+                  NEXT_PUBLIC_API_URL
+                </code>{" "}
+                환경 변수가 올바르게 설정되었는지 확인해주세요.
+              </p>
+              <Link
+                href="/posts"
+                className="mt-4 inline-block text-sm text-yellow-800 underline dark:text-yellow-200"
+              >
+                ← 포스트 목록으로 돌아가기
+              </Link>
+            </div>
+          </main>
+        </>
+      );
+    }
     notFound();
   }
 
-  const content = await getPostContentWithHtml(post);
-  const dateObj = new Date(post.metadata.date);
+  const content = await markdownToHtml(post.content);
+  const dateObj = new Date(post.publishedAt);
   const formattedDate = format(dateObj, "yyyy년 M월 d일", {
     locale: ko,
   });
 
-  // 구조화된 데이터 (JSON-LD)
+  // 구조화된 데이터 (JSON-LD) - BlogPosting
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
-    headline: post.metadata.title,
-    description: post.metadata.description || "",
-    image: `${siteConfig.url}/og-image.png`,
-    datePublished: post.metadata.date,
-    dateModified: post.metadata.date,
+    headline: post.title,
+    description: post.excerpt || "",
+    image: `${siteConfig.url}${siteConfig.ogImage}`,
+    datePublished: post.publishedAt,
+    dateModified: post.publishedAt,
     author: {
       "@type": "Person",
       name: siteConfig.name,
+      url: siteConfig.url,
     },
     publisher: {
       "@type": "Organization",
       name: siteConfig.name,
+      url: siteConfig.url,
     },
     mainEntityOfPage: {
       "@type": "WebPage",
       "@id": `${siteConfig.url}/posts/${slugString}`,
     },
-    keywords: post.metadata.tags?.join(", ") || "",
-    articleSection: post.metadata.category || "",
+    keywords: post.tags.map((tag) => tag.name).join(", ") || "",
+    articleSection: post.categorySlug || "",
+    inLanguage: "ko-KR",
+  };
+
+  // Breadcrumb 구조화된 데이터
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "홈",
+        item: siteConfig.url,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "포스트",
+        item: `${siteConfig.url}/posts`,
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: post.title,
+        item: `${siteConfig.url}/posts/${slugString}`,
+      },
+    ],
   };
 
   return (
@@ -110,6 +240,10 @@ export default async function PostPage({ params }: PostPageProps) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
       <Header />
       <main className="mx-auto min-h-screen max-w-4xl px-4 py-12">
@@ -122,13 +256,16 @@ export default async function PostPage({ params }: PostPageProps) {
 
         <article className="prose prose-lg max-w-none dark:prose-invert">
           <div className="mb-6 flex items-center gap-2">
-            {post.metadata.category && (
-              <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-                {post.metadata.category}
-              </span>
+            {post.categorySlug && (
+              <Link
+                href={`/categories/${post.categorySlug}`}
+                className="rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-800 transition-colors hover:bg-blue-200 dark:bg-blue-900 dark:text-blue-200 dark:hover:bg-blue-800"
+              >
+                {post.categoryName}
+              </Link>
             )}
             <time
-              dateTime={post.metadata.date}
+              dateTime={post.publishedAt}
               className="text-sm text-gray-500 dark:text-gray-400"
             >
               {formattedDate}
@@ -136,24 +273,25 @@ export default async function PostPage({ params }: PostPageProps) {
           </div>
 
           <h1 className="mb-4 text-4xl font-bold text-gray-900 dark:text-gray-100">
-            {post.metadata.title}
+            {post.title}
           </h1>
 
-          {post.metadata.description && (
+          {post.excerpt && (
             <p className="mb-8 text-xl text-gray-600 dark:text-gray-400">
-              {post.metadata.description}
+              {post.excerpt}
             </p>
           )}
 
-          {post.metadata.tags && post.metadata.tags.length > 0 && (
+          {post.tags && post.tags.length > 0 && (
             <div className="mb-8 flex flex-wrap gap-2">
-              {post.metadata.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="rounded bg-gray-100 px-3 py-1 text-sm text-gray-600 dark:bg-gray-800 dark:text-gray-400"
+              {post.tags.map((tag) => (
+                <Link
+                  key={tag.id}
+                  href={`/posts?tag=${tag.slug}`}
+                  className="rounded bg-gray-100 px-3 py-1 text-sm text-gray-600 transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700"
                 >
-                  #{tag}
-                </span>
+                  #{tag.name}
+                </Link>
               ))}
             </div>
           )}

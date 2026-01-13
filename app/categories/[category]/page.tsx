@@ -1,28 +1,45 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getAllPosts, getPostsByCategory } from "@/lib/posts";
-import { getCategoryById, getCategoryPath } from "@/lib/categories";
+import { getCategoryById } from "@/lib/categories";
 import { siteConfig } from "@/lib/site";
 import PostCard from "@/app/components/PostCard";
 import Header from "@/app/components/Header";
 import Link from "next/link";
+import { publicApi } from "@/lib/api-client";
 
 interface CategoryPageProps {
   params: Promise<{ category: string }>;
 }
 
 export async function generateStaticParams() {
-  const { getAllCategoryIds } = await import("@/lib/categories");
-  return getAllCategoryIds().map((categoryId) => ({
-    category: categoryId,
-  }));
+  // API에서 카테고리 목록 가져오기
+  try {
+    const response = await publicApi.getCategories();
+    if (response.success && response.data) {
+      return response.data.map((cat) => ({
+        category: cat.slug,
+      }));
+    }
+  } catch (error) {
+    console.error("Failed to fetch categories for static params:", error);
+  }
+  return [];
 }
 
 export async function generateMetadata({
   params,
 }: CategoryPageProps): Promise<Metadata> {
   const { category } = await params;
-  const categoryData = getCategoryById(category);
+
+  let categoryData: { name: string; description?: string } | null = null;
+  try {
+    const response = await publicApi.getCategoryBySlug(category);
+    if (response.success && response.data) {
+      categoryData = response.data;
+    }
+  } catch (error) {
+    console.error("Failed to fetch category:", error);
+  }
 
   if (!categoryData) {
     return {
@@ -31,7 +48,9 @@ export async function generateMetadata({
   }
 
   const title = `${categoryData.name} | ${siteConfig.name}`;
-  const description = `${categoryData.name} 카테고리의 포스트 목록입니다.`;
+  const description =
+    categoryData.description ||
+    `${categoryData.name} 카테고리의 포스트 목록입니다.`;
 
   return {
     title,
@@ -51,13 +70,36 @@ export async function generateMetadata({
 
 export default async function CategoryPage({ params }: CategoryPageProps) {
   const { category } = await params;
-  const categoryData = getCategoryById(category);
+
+  let categoryData: { name: string; description?: string } | null = null;
+  let posts: Array<{
+    id: string;
+    title: string;
+    excerpt: string;
+    slug: string;
+    publishedAt: string;
+    categoryName: string;
+    categorySlug: string;
+    tags: Array<{ id: string; name: string; slug: string }>;
+  }> = [];
+
+  try {
+    const categoryResponse = await publicApi.getCategoryBySlug(category);
+    if (categoryResponse.success && categoryResponse.data) {
+      categoryData = categoryResponse.data;
+    }
+
+    const postsResponse = await publicApi.getPosts({ category });
+    if (postsResponse.success && postsResponse.data) {
+      posts = postsResponse.data;
+    }
+  } catch (error) {
+    console.error("Failed to fetch category data:", error);
+  }
 
   if (!categoryData) {
     notFound();
   }
-
-  const posts = getPostsByCategory(category);
 
   return (
     <>
@@ -89,9 +131,15 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
           <div className="grid gap-6 md:grid-cols-2">
             {posts.map((post) => (
               <PostCard
-                key={post.slug}
+                key={post.id}
                 slug={post.slug}
-                metadata={post.metadata}
+                metadata={{
+                  title: post.title,
+                  date: post.publishedAt,
+                  description: post.excerpt,
+                  category: post.categorySlug,
+                  tags: post.tags.map((tag) => tag.name),
+                }}
               />
             ))}
           </div>
