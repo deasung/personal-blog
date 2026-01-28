@@ -2,17 +2,12 @@
 
 ## 환경 변수 설정
 
-프로젝트 루트에 `.env.local` 파일을 생성하고 다음 내용을 추가하세요:
+프로젝트 루트에 `.env` 파일을 생성하고 다음 내용을 추가하세요:
 
 ```env
 # API 서버 URL
 # API 서버가 별도로 실행되는 경우 해당 URL을 설정하세요
-# ⚠️ 중요: Next.js 앱과 다른 포트를 사용해야 합니다
-# 예: Next.js가 3000에서 실행 중이면 API 서버는 3002 등 다른 포트 사용
-NEXT_PUBLIC_API_URL=http://localhost:3002
-
-# 사이트 URL
-NEXT_PUBLIC_SITE_URL=http://localhost:3000
+VITE_PUBLIC_API_URL=http://localhost:4000
 ```
 
 ## API 서버 실행
@@ -47,12 +42,12 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ## API 서버가 없을 때
 
 API 서버가 실행되지 않으면 블로그 페이지에 경고 메시지가 표시됩니다.
-API 서버를 실행하거나 `.env.local` 파일에서 `NEXT_PUBLIC_API_URL`을 올바른 값으로 설정하세요.
+API 서버를 실행하거나 `.env` 파일에서 `VITE_PUBLIC_API_URL`을 올바른 값으로 설정하세요.
 
 ## 개발 모드
 
 1. API 서버를 먼저 실행하세요 (포트 3001 또는 설정한 포트)
-2. Next.js 개발 서버 실행:
+2. Vite 개발 서버 실행:
    ```bash
    npm run dev
    ```
@@ -62,7 +57,7 @@ API 서버를 실행하거나 `.env.local` 파일에서 `NEXT_PUBLIC_API_URL`을
 ### "API 엔드포인트를 찾을 수 없습니다" 에러
 
 - API 서버가 실행 중인지 확인하세요
-- `NEXT_PUBLIC_API_URL` 환경 변수가 올바른지 확인하세요
+- `VITE_PUBLIC_API_URL` 환경 변수가 올바른지 확인하세요
 - API 서버의 포트와 URL이 일치하는지 확인하세요
 
 ### "API 서버에 연결할 수 없습니다" 에러

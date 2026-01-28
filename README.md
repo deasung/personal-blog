@@ -1,6 +1,6 @@
 # 개발 블로그
 
-Next.js와 마크다운을 사용한 개인 개발 블로그입니다.
+React + Vite 기반 개인 개발 블로그입니다. (어드민은 백엔드 JWT 로그인 + localStorage 토큰 방식)
 
 ## 주요 기능
 
@@ -8,10 +8,8 @@ Next.js와 마크다운을 사용한 개인 개발 블로그입니다.
 - 🎨 코드 하이라이팅 지원
 - 🌙 다크 모드 지원
 - 📱 반응형 디자인
-- ⚡ Next.js App Router 사용
-- 🚀 Vercel 배포 최적화
-- 🔍 **SEO 최적화** (메타데이터, 구조화된 데이터, 사이트맵, robots.txt)
-- 📊 **서버사이드 렌더링 (SSR/SSG)** - 모든 페이지가 정적으로 생성되어 검색 엔진 최적화
+- ⚡ React Router 기반 라우팅 (SPA)
+- 🔐 어드민: JWT 로그인 후 `admin_token`을 localStorage에 저장해 API 호출
 
 ## 시작하기
 
@@ -21,7 +19,7 @@ Next.js와 마크다운을 사용한 개인 개발 블로그입니다.
 npm run dev
 ```
 
-브라우저에서 [http://localhost:3000](http://localhost:3000)을 열어 확인하세요.
+브라우저에서 `http://localhost:3000`을 열어 확인하세요.
 
 ### 포스트 작성하기
 
@@ -47,14 +45,10 @@ tags: [태그1, 태그2]
 
 ```
 personal-blog/
-├── app/                 # Next.js App Router
-│   ├── components/      # 재사용 가능한 컴포넌트
-│   ├── posts/          # 포스트 관련 페이지
-│   ├── layout.tsx      # 루트 레이아웃
-│   └── page.tsx        # 홈 페이지
-├── lib/                # 유틸리티 함수
-│   └── posts.ts        # 포스트 관련 함수
-├── posts/              # 마크다운 포스트 파일들
+├── src/                # React 앱 (Vite)
+│   ├── components/     # 재사용 컴포넌트
+│   ├── pages/          # 라우트 페이지
+│   └── lib/            # API 클라이언트 등
 └── public/             # 정적 파일
 ```
 
@@ -69,7 +63,7 @@ personal-blog/
 
 ### 환경 변수
 
-Vercel 배포 시 자동으로 `NEXT_PUBLIC_SITE_URL`이 설정됩니다. 로컬 개발 시에는 `lib/site.ts` 파일에서 사이트 URL을 수정하세요.
+Vercel/호스팅 환경에서는 프로젝트 설정에서 환경변수를 등록하세요.
 
 ## SEO 최적화 기능
 
@@ -85,13 +79,17 @@ Vercel 배포 시 자동으로 `NEXT_PUBLIC_SITE_URL`이 설정됩니다. 로컬
 
 ## 기술 스택
 
-- **Next.js 16** - React 프레임워크 (App Router)
+- **React + Vite** - 프론트엔드
 - **TypeScript** - 타입 안정성
 - **Tailwind CSS** - 스타일링
-- **gray-matter** - 마크다운 프론트매터 파싱
-- **remark/rehype** - 마크다운 처리 및 HTML 변환
 - **highlight.js** - 코드 하이라이팅
 - **date-fns** - 날짜 포맷팅
+
+## 환경 변수
+
+`env.example`를 참고해서 `.env`에 설정하세요:
+
+- `VITE_PUBLIC_API_URL`: 백엔드 API 베이스 URL (예: `https://0ueo0wph68.execute-api.ap-northeast-2.amazonaws.com/production`)
 
 ## 라이선스
 
