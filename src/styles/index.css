@@ -45,6 +45,26 @@ pre code {
   margin: 0.25rem 0;
 }
 
+/* Tiptap TaskList 스타일 */
+.ProseMirror ul[data-type="taskList"] {
+  list-style: none;
+  padding-left: 0.5rem;
+}
+
+.ProseMirror li[data-type="taskItem"] {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.ProseMirror li[data-type="taskItem"] > label {
+  margin-top: 0.1rem;
+}
+
+.ProseMirror li[data-type="taskItem"] > div {
+  flex: 1;
+}
+
 .ProseMirror h1,
 .ProseMirror h2,
 .ProseMirror h3,

@@ -1,7 +1,7 @@
 const DEFAULT_API_BASE_URL =
   "https://0ueo0wph68.execute-api.ap-northeast-2.amazonaws.com/production";
 
-function getApiBaseUrl(): string {
+export function getApiBaseUrl(): string {
   const url =
     import.meta.env.VITE_PUBLIC_API_URL ||
     import.meta.env.VITE_API_BASE_URL ||
