@@ -39,6 +39,71 @@ pre code {
   @apply bg-transparent p-0;
 }
 
+/* Tiptap 편집 영역 리스트 마커가 CSS에 의해 안 보이는 경우를 대비 */
+.ProseMirror ul {
+  list-style-type: disc;
+  padding-left: 1.25rem;
+}
+
+.ProseMirror ol {
+  list-style-type: decimal;
+  padding-left: 1.25rem;
+}
+
+.ProseMirror li {
+  margin: 0.25rem 0;
+}
+
+/* Tailwind preflight가 h1~h6를 inherit로 리셋해서, 에디터 안에서는 헤딩이 안 커 보일 수 있음 */
+.ProseMirror h1,
+.ProseMirror h2,
+.ProseMirror h3,
+.ProseMirror h4 {
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 1.1em 0 0.6em;
+}
+
+.ProseMirror h1 {
+  font-size: 2rem; /* ~32px */
+}
+.ProseMirror h2 {
+  font-size: 1.75rem; /* ~28px */
+}
+.ProseMirror h3 {
+  font-size: 1.5rem; /* ~24px */
+}
+.ProseMirror h4 {
+  font-size: 1.25rem; /* ~20px */
+}
+
+.ProseMirror p {
+  margin: 0.75em 0;
+}
+
+/* Tiptap 코드블록 하이라이팅 스타일 */
+pre code.hljs {
+  @apply bg-transparent p-0;
+  display: block;
+  overflow-x: auto;
+  padding: 1em;
+}
+
+code.hljs {
+  @apply bg-transparent p-0;
+}
+
+.hljs {
+  @apply bg-gray-100 dark:bg-gray-800;
+  color: #333;
+}
+
+@media (prefers-color-scheme: dark) {
+  .hljs {
+    color: #e0e0e0;
+  }
+}
+
 /* Prism.js 스타일링 */
 .token.comment,
 .token.prolog,

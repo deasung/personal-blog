@@ -49,14 +49,14 @@ export default async function SubCategoryPage({
   const { category, subcategory } = await params;
 
   let posts: Array<{
-    id: string;
+    id: number;
     title: string;
     excerpt: string;
     slug: string;
     publishedAt: string;
     categoryName: string;
     categorySlug: string;
-    tags: Array<{ id: string; name: string; slug: string }>;
+    tags: Array<{ id: number; name: string; slug: string }>;
   }> = [];
 
   try {
@@ -110,6 +110,7 @@ export default async function SubCategoryPage({
             {posts.map((post) => (
               <PostCard
                 key={post.id}
+                id={post.id}
                 slug={post.slug}
                 metadata={{
                   title: post.title,

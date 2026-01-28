@@ -4,48 +4,41 @@ import { format } from "date-fns";
 import { ko } from "date-fns/locale";
 import Header from "@/app/components/Header";
 import Link from "next/link";
+import Image from "next/image";
 import { siteConfig } from "@/lib/site";
 import { publicApi } from "@/lib/api-client";
-import { remark } from "remark";
-import remarkRehype from "remark-rehype";
-import rehypeStringify from "rehype-stringify";
-import rehypeHighlight from "rehype-highlight";
+
+// 동적 라우팅 활성화 (런타임에 생성된 포스트도 처리)
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 interface PostPageProps {
-  params: Promise<{ slug: string[] }>;
-}
-
-export async function generateStaticParams() {
-  // API에서 모든 포스트 slug 가져오기
-  try {
-    const response = await publicApi.getPosts({ limit: 1000 });
-    if (response.success && response.data) {
-      return response.data.map((post) => ({
-        slug: post.slug.split("/"),
-      }));
-    }
-  } catch (error) {
-    console.error("Failed to fetch posts for static params:", error);
-  }
-  return [];
+  params: Promise<{ id: string }>;
 }
 
 export async function generateMetadata({
   params,
 }: PostPageProps): Promise<Metadata> {
-  const { slug } = await params;
-  const slugString = Array.isArray(slug) ? slug.join("/") : slug;
+  const { id } = await params;
+  const postId = parseInt(id, 10);
+
+  if (isNaN(postId)) {
+    return {
+      title: "포스트를 찾을 수 없습니다",
+    };
+  }
 
   let post: {
     title: string;
     excerpt: string;
+    thumbnail?: string | null;
     publishedAt: string;
     tags: Array<{ name: string }>;
     categorySlug?: string;
   } | null = null;
 
   try {
-    const response = await publicApi.getPostBySlug(slugString);
+    const response = await publicApi.getPostById(postId);
     if (response.success && response.data) {
       post = response.data;
     }
@@ -61,11 +54,11 @@ export async function generateMetadata({
 
   const title = `${post.title} | ${siteConfig.name}`;
   const description = post.excerpt || siteConfig.description;
-  const url = `${siteConfig.url}/posts/${slugString}`;
+  const url = `${siteConfig.url}/posts/${id}`;
   const publishedTime = new Date(post.publishedAt).toISOString();
 
   // Open Graph 이미지 URL 생성 (포스트에 이미지가 있으면 사용, 없으면 기본 이미지)
-  const ogImage = `${siteConfig.url}${siteConfig.ogImage}`;
+  const ogImage = post.thumbnail || `${siteConfig.url}${siteConfig.ogImage}`;
 
   return {
     title,
@@ -105,37 +98,37 @@ export async function generateMetadata({
   };
 }
 
-async function markdownToHtml(content: string): Promise<string> {
-  const processedContent = await remark()
-    .use(remarkRehype, { allowDangerousHtml: true })
-    .use(rehypeHighlight)
-    .use(rehypeStringify, { allowDangerousHtml: true })
-    .process(content);
-
-  return processedContent.toString();
-}
-
 export default async function PostPage({ params }: PostPageProps) {
-  const { slug } = await params;
-  const slugString = Array.isArray(slug) ? slug.join("/") : slug;
+  const { id } = await params;
+  const postId = parseInt(id, 10);
+
+  if (isNaN(postId)) {
+    notFound();
+  }
 
   let post: {
-    id: string;
+    id: number;
     title: string;
+    thumbnail?: string | null;
     content: string;
     excerpt: string;
     slug: string;
     publishedAt: string;
+    createdAt: string;
+    updatedAt: string;
+    categoryId: number;
     categoryName: string;
     categorySlug: string;
-    tags: Array<{ id: string; name: string; slug: string }>;
+    tags: Array<{ id: number; name: string; slug: string }>;
   } | null = null;
   let apiError: string | null = null;
 
   try {
-    const response = await publicApi.getPostBySlug(slugString);
+    const response = await publicApi.getPostById(postId);
     if (response.success && response.data) {
       post = response.data;
+    } else {
+      apiError = response.message || "포스트를 찾을 수 없습니다.";
     }
   } catch (error) {
     console.error("Failed to fetch post:", error);
@@ -155,6 +148,12 @@ export default async function PostPage({ params }: PostPageProps) {
                 ⚠️ {apiError}
               </p>
               <p className="mt-2 text-sm text-yellow-700 dark:text-yellow-300">
+                요청한 ID:{" "}
+                <code className="rounded bg-yellow-100 px-1 py-0.5 text-xs dark:bg-yellow-900">
+                  {id}
+                </code>
+              </p>
+              <p className="mt-2 text-sm text-yellow-700 dark:text-yellow-300">
                 API 서버가 실행 중인지 확인하고,{" "}
                 <code className="rounded bg-yellow-100 px-1 py-0.5 text-xs dark:bg-yellow-900">
                   NEXT_PUBLIC_API_URL
@@ -172,10 +171,12 @@ export default async function PostPage({ params }: PostPageProps) {
         </>
       );
     }
+    // 포스트를 찾을 수 없는 경우 404
     notFound();
   }
 
-  const content = await markdownToHtml(post.content);
+  // API에서 받은 content가 이미 HTML이므로 그대로 사용
+  const content = post.content;
   const dateObj = new Date(post.publishedAt);
   const formattedDate = format(dateObj, "yyyy년 M월 d일", {
     locale: ko,
@@ -187,9 +188,9 @@ export default async function PostPage({ params }: PostPageProps) {
     "@type": "BlogPosting",
     headline: post.title,
     description: post.excerpt || "",
-    image: `${siteConfig.url}${siteConfig.ogImage}`,
+    image: post.thumbnail || `${siteConfig.url}${siteConfig.ogImage}`,
     datePublished: post.publishedAt,
-    dateModified: post.publishedAt,
+    dateModified: post.updatedAt || post.publishedAt,
     author: {
       "@type": "Person",
       name: siteConfig.name,
@@ -202,7 +203,7 @@ export default async function PostPage({ params }: PostPageProps) {
     },
     mainEntityOfPage: {
       "@type": "WebPage",
-      "@id": `${siteConfig.url}/posts/${slugString}`,
+      "@id": `${siteConfig.url}/posts/${id}`,
     },
     keywords: post.tags.map((tag) => tag.name).join(", ") || "",
     articleSection: post.categorySlug || "",
@@ -230,7 +231,7 @@ export default async function PostPage({ params }: PostPageProps) {
         "@type": "ListItem",
         position: 3,
         name: post.title,
-        item: `${siteConfig.url}/posts/${slugString}`,
+        item: `${siteConfig.url}/posts/${id}`,
       },
     ],
   };
@@ -271,6 +272,21 @@ export default async function PostPage({ params }: PostPageProps) {
               {formattedDate}
             </time>
           </div>
+
+          {post.thumbnail && (
+            <div className="not-prose mb-8">
+              <div className="relative h-64 w-full overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800">
+                <Image
+                  src={post.thumbnail}
+                  alt={`${post.title} 대표 썸네일`}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 768px"
+                  className="object-cover"
+                  priority
+                />
+              </div>
+            </div>
+          )}
 
           <h1 className="mb-4 text-4xl font-bold text-gray-900 dark:text-gray-100">
             {post.title}

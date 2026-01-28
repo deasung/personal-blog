@@ -43,7 +43,7 @@ export class PublicApiClient {
 
     const url = `${this.baseUrl}${endpoint}`;
 
-    console.log(url)
+    console.log(url);
 
     try {
       const response = await fetch(url, {
@@ -102,7 +102,7 @@ export class PublicApiClient {
     return this.request<{
       token: string;
       admin: {
-        id: string;
+        id: number;
         email: string;
         username: string;
         role: string;
@@ -116,7 +116,7 @@ export class PublicApiClient {
   // 현재 어드민 정보 조회
   async getMe(token: string) {
     return this.request<{
-      id: string;
+      id: number;
       email: string;
       username: string;
       role: string;
@@ -133,11 +133,12 @@ export class PublicApiClient {
   async getCategories() {
     return this.request<
       Array<{
-        id: string;
+        id: number;
         name: string;
         slug: string;
         description: string;
         createdAt: string;
+        postsCount?: number;
       }>
     >("/public/categories");
   }
@@ -145,7 +146,7 @@ export class PublicApiClient {
   // 카테고리 상세 조회
   async getCategoryBySlug(slug: string) {
     return this.request<{
-      id: string;
+      id: number;
       name: string;
       slug: string;
       description: string;
@@ -158,7 +159,7 @@ export class PublicApiClient {
   async getTags() {
     return this.request<
       Array<{
-        id: string;
+        id: number;
         name: string;
         slug: string;
         createdAt: string;
@@ -170,7 +171,7 @@ export class PublicApiClient {
   // 태그 상세 조회
   async getTagBySlug(slug: string) {
     return this.request<{
-      id: string;
+      id: number;
       name: string;
       slug: string;
       createdAt: string;
@@ -196,17 +197,18 @@ export class PublicApiClient {
 
     return this.request<
       Array<{
-        id: string;
+        id: number;
         title: string;
+        thumbnail?: string | null;
         excerpt: string;
         slug: string;
         publishedAt: string;
         createdAt: string;
-        categoryId: string;
+        categoryId: number;
         categoryName: string;
         categorySlug: string;
         tags: Array<{
-          id: string;
+          id: number;
           name: string;
           slug: string;
         }>;
@@ -214,26 +216,65 @@ export class PublicApiClient {
     >(endpoint);
   }
 
-  // 포스트 상세 조회
-  async getPostBySlug(slug: string) {
+  // 포스트 상세 조회 (ID 기반)
+  async getPostById(id: number) {
     return this.request<{
-      id: string;
+      id: number;
       title: string;
+      thumbnail?: string | null;
       content: string;
       excerpt: string;
       slug: string;
       publishedAt: string;
       createdAt: string;
       updatedAt: string;
-      categoryId: string;
+      categoryId: number;
       categoryName: string;
       categorySlug: string;
       tags: Array<{
-        id: string;
+        id: number;
+        name: string;
+        slug: string;
+      }>;
+    }>(`/public/posts/id/${id}`);
+  }
+
+  // 포스트 상세 조회 (slug 기반)
+  async getPostBySlug(slug: string) {
+    return this.request<{
+      id: number;
+      title: string;
+      thumbnail?: string | null;
+      content: string;
+      excerpt: string;
+      slug: string;
+      publishedAt: string;
+      createdAt: string;
+      updatedAt: string;
+      categoryId: number;
+      categoryName: string;
+      categorySlug: string;
+      tags: Array<{
+        id: number;
         name: string;
         slug: string;
       }>;
     }>(`/public/posts/${slug}`);
+  }
+
+  // 공개 설정 조회
+  async getSettings() {
+    return this.request<
+      Record<
+        string,
+        {
+          id: number;
+          value: string | null;
+          createdAt: string;
+          updatedAt: string;
+        }
+      >
+    >("/public/settings");
   }
 }
 
@@ -282,7 +323,7 @@ export class AdminApiClient {
   async getCategories() {
     return this.request<
       Array<{
-        id: string;
+        id: number;
         name: string;
         slug: string;
         description: string;
@@ -295,7 +336,7 @@ export class AdminApiClient {
   // 카테고리 생성
   async createCategory(data: { name: string; description?: string }) {
     return this.request<{
-      id: string;
+      id: number;
       name: string;
       slug: string;
       description: string;
@@ -309,11 +350,11 @@ export class AdminApiClient {
 
   // 카테고리 수정
   async updateCategory(
-    id: string,
+    id: number,
     data: { name: string; description?: string }
   ) {
     return this.request<{
-      id: string;
+      id: number;
       name: string;
       slug: string;
       description: string;
@@ -326,7 +367,7 @@ export class AdminApiClient {
   }
 
   // 카테고리 삭제
-  async deleteCategory(id: string) {
+  async deleteCategory(id: number) {
     return this.request<void>(`/admin/categories/${id}`, {
       method: "DELETE",
     });
@@ -336,7 +377,7 @@ export class AdminApiClient {
   async getTags() {
     return this.request<
       Array<{
-        id: string;
+        id: number;
         name: string;
         slug: string;
         createdAt: string;
@@ -348,7 +389,7 @@ export class AdminApiClient {
   // 태그 생성
   async createTag(data: { name: string }) {
     return this.request<{
-      id: string;
+      id: number;
       name: string;
       slug: string;
       createdAt: string;
@@ -360,9 +401,9 @@ export class AdminApiClient {
   }
 
   // 태그 수정
-  async updateTag(id: string, data: { name: string }) {
+  async updateTag(id: number, data: { name: string }) {
     return this.request<{
-      id: string;
+      id: number;
       name: string;
       slug: string;
       createdAt: string;
@@ -374,7 +415,7 @@ export class AdminApiClient {
   }
 
   // 태그 삭제
-  async deleteTag(id: string) {
+  async deleteTag(id: number) {
     return this.request<void>(`/admin/tags/${id}`, {
       method: "DELETE",
     });
@@ -397,8 +438,9 @@ export class AdminApiClient {
 
     return this.request<
       Array<{
-        id: string;
+        id: number;
         title: string;
+        thumbnail?: string | null;
         content: string;
         excerpt: string;
         slug: string;
@@ -406,11 +448,11 @@ export class AdminApiClient {
         publishedAt: string | null;
         createdAt: string;
         updatedAt: string;
-        categoryId: string;
+        categoryId: number;
         categoryName: string;
         categorySlug: string;
         tags: Array<{
-          id: string;
+          id: number;
           name: string;
           slug: string;
         }>;
@@ -423,13 +465,15 @@ export class AdminApiClient {
     title: string;
     content: string;
     excerpt?: string;
-    categoryId: string;
+    thumbnail?: string | null;
+    categoryId: number;
     published?: boolean;
-    tagIds?: string[];
+    tagIds?: number[];
   }) {
     return this.request<{
-      id: string;
+      id: number;
       title: string;
+      thumbnail?: string | null;
       content: string;
       excerpt: string;
       slug: string;
@@ -437,11 +481,11 @@ export class AdminApiClient {
       publishedAt: string | null;
       createdAt: string;
       updatedAt: string;
-      categoryId: string;
+      categoryId: number;
       categoryName: string;
       categorySlug: string;
       tags: Array<{
-        id: string;
+        id: number;
         name: string;
         slug: string;
       }>;
@@ -453,19 +497,21 @@ export class AdminApiClient {
 
   // 포스트 수정
   async updatePost(
-    id: string,
+    id: number,
     data: {
       title?: string;
       content?: string;
       excerpt?: string;
-      categoryId?: string;
+      thumbnail?: string | null;
+      categoryId?: number;
       published?: boolean;
-      tagIds?: string[];
+      tagIds?: number[];
     }
   ) {
     return this.request<{
-      id: string;
+      id: number;
       title: string;
+      thumbnail?: string | null;
       content: string;
       excerpt: string;
       slug: string;
@@ -473,11 +519,11 @@ export class AdminApiClient {
       publishedAt: string | null;
       createdAt: string;
       updatedAt: string;
-      categoryId: string;
+      categoryId: number;
       categoryName: string;
       categorySlug: string;
       tags: Array<{
-        id: string;
+        id: number;
         name: string;
         slug: string;
       }>;
@@ -488,9 +534,44 @@ export class AdminApiClient {
   }
 
   // 포스트 삭제
-  async deletePost(id: string) {
+  async deletePost(id: number) {
     return this.request<void>(`/admin/posts/${id}`, {
       method: "DELETE",
+    });
+  }
+
+  // 설정 조회
+  async getSettings() {
+    return this.request<
+      Record<
+        string,
+        {
+          id: number;
+          value: string | null;
+          createdAt: string;
+          updatedAt: string;
+        }
+      >
+    >("/admin/settings");
+  }
+
+  // 설정 수정 (부분 업데이트)
+  // - 백엔드가 { settings: {...} } 또는 { key: value } 형태를 모두 허용하므로
+  //   확장 포맷인 { settings }로 보내도록 통일
+  async updateSettings(settings: Record<string, unknown>) {
+    return this.request<
+      Record<
+        string,
+        {
+          id: number;
+          value: string | null;
+          createdAt: string;
+          updatedAt: string;
+        }
+      >
+    >("/admin/settings", {
+      method: "PUT",
+      body: JSON.stringify({ settings }),
     });
   }
 }

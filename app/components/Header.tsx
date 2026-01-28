@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-export default function Header() {
+export default function Header({ title }: { title?: string }) {
   return (
     <header className="sticky top-0 z-50 border-b border-gray-200 bg-white/80 backdrop-blur-sm dark:border-gray-800 dark:bg-gray-900/80">
       <nav className="mx-auto flex max-w-4xl items-center justify-between px-4 py-4">
@@ -8,7 +8,7 @@ export default function Header() {
           href="/"
           className="text-xl font-bold text-gray-900 dark:text-gray-100"
         >
-          40대 개발자
+          {title || "40대 개발자"}
         </Link>
         <div className="flex gap-6">
           <Link

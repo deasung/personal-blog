@@ -31,16 +31,20 @@ export const metadata: Metadata = {
 export default async function Home() {
   // API에서 최신 포스트 가져오기
   let posts: Array<{
-    id: string;
+    id: number;
     title: string;
     excerpt: string;
     slug: string;
     publishedAt: string;
     categoryName: string;
     categorySlug: string;
-    tags: Array<{ id: string; name: string; slug: string }>;
+    tags: Array<{ id: number; name: string; slug: string }>;
   }> = [];
   let apiError: string | null = null;
+  let settings: Record<
+    string,
+    { id: number; value: string | null; createdAt: string; updatedAt: string }
+  > | null = null;
 
   try {
     const response = await publicApi.getPosts({ limit: 6 });
@@ -53,12 +57,24 @@ export default async function Home() {
       error instanceof Error ? error.message : "API 서버에 연결할 수 없습니다.";
   }
 
+  // 설정 가져오기 (없으면 siteConfig fallback)
+  try {
+    const res = await publicApi.getSettings();
+    if (res.success && res.data) settings = res.data;
+  } catch (error) {
+    console.error("Failed to fetch settings:", error);
+  }
+
+  const siteTitle = settings?.site_title?.value || siteConfig.name;
+  const siteDescription =
+    settings?.site_description?.value || siteConfig.description;
+
   // 구조화된 데이터 (JSON-LD) - 웹사이트
   const websiteJsonLd = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: siteConfig.name,
-    description: siteConfig.description,
+    name: siteTitle,
+    description: siteDescription,
     url: siteConfig.url,
     potentialAction: {
       "@type": "SearchAction",
@@ -74,12 +90,12 @@ export default async function Home() {
   const blogJsonLd = {
     "@context": "https://schema.org",
     "@type": "Blog",
-    name: siteConfig.name,
-    description: siteConfig.description,
+    name: siteTitle,
+    description: siteDescription,
     url: siteConfig.url,
     publisher: {
       "@type": "Person",
-      name: siteConfig.name,
+      name: siteTitle,
     },
   };
 
@@ -93,14 +109,14 @@ export default async function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(blogJsonLd) }}
       />
-      <Header />
+      <Header title={siteTitle} />
       <main className="mx-auto min-h-screen max-w-4xl px-4 py-12">
         <section className="mb-16 text-center">
           {/*<h1 className="mb-4 text-5xl font-bold text-gray-900 dark:text-gray-100">*/}
           {/*  열심히..살아남자*/}
           {/*</h1>*/}
           <p className="text-xl text-gray-600 dark:text-gray-400">
-            개발과 취미에 관한 이야기를 나누는 공간입니다.
+            {siteDescription}
           </p>
         </section>
 
@@ -170,6 +186,7 @@ export default async function Home() {
                 {posts.map((post) => (
                   <PostCard
                     key={post.id}
+                    id={post.id}
                     slug={post.slug}
                     metadata={{
                       title: post.title,

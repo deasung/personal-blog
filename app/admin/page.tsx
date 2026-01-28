@@ -6,7 +6,7 @@ import Link from "next/link";
 import { publicApi } from "@/lib/api-client";
 
 interface AdminUser {
-  id: string;
+  id: number;
   email: string;
   username: string;
   role: string;
@@ -58,6 +58,12 @@ export default function AdminDashboard() {
             <span className="text-sm text-gray-600 dark:text-gray-400">
               {adminUser.email}
             </span>
+            <Link
+              href="/"
+              className="rounded-md bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+            >
+              블로그 홈
+            </Link>
             <button
               onClick={handleLogout}
               className="rounded-md bg-red-600 px-4 py-2 text-sm text-white transition-colors hover:bg-red-700"
@@ -100,6 +106,18 @@ export default function AdminDashboard() {
             </h3>
             <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
               카테고리를 추가, 수정, 삭제할 수 있습니다.
+            </p>
+          </Link>
+
+          <Link
+            href="/admin/tags"
+            className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-md dark:border-gray-700 dark:bg-gray-800"
+          >
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+              태그 관리
+            </h3>
+            <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+              태그를 추가, 수정, 삭제할 수 있습니다.
             </p>
           </Link>
 
