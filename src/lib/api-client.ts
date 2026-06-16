@@ -3,8 +3,7 @@ const DEFAULT_API_BASE_URL =
 
 export function getApiBaseUrl(): string {
   const url =
-    import.meta.env.VITE_PUBLIC_API_URL ||
-    import.meta.env.VITE_API_BASE_URL ||
+    process.env.NEXT_PUBLIC_API_URL ||
     DEFAULT_API_BASE_URL;
   return String(url).replace(/\/+$/, "");
 }

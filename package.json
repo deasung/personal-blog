@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
-    "lint": "eslint ."
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.968.0",
@@ -28,9 +28,10 @@
     "gray-matter": "^4.0.3",
     "highlight.js": "^11.11.1",
     "lowlight": "^3.3.0",
+    "next": "^16.2.9",
     "react": "19.2.1",
-    "react-dom": "19.2.1",
-    "react-router-dom": "^6.30.0",
+    "react-dom": "^19.2.1",
+    "react-router-dom": "^6.30.4",
     "rehype-highlight": "^7.0.2",
     "rehype-stringify": "^10.0.1",
     "remark": "^15.0.1",
@@ -40,13 +41,12 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
-    "@vitejs/plugin-react": "^5.0.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
+    "eslint-config-next": "^16.2.9",
     "tailwindcss": "^4",
-    "typescript": "^5",
-    "vite": "^6.1.0"
+    "typescript": "^5"
   }
 }
