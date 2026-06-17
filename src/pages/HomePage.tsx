@@ -67,53 +67,50 @@ export default function HomePage() {
   return (
     <>
       <Header title={siteTitle} />
-      <main className="mx-auto min-h-screen max-w-4xl px-4 py-12">
-        <section className="mb-16 text-center">
-          <p className="text-xl text-gray-600 dark:text-gray-400">
+      <main className="mx-auto min-h-screen max-w-2xl px-6 py-16 sm:px-8">
+        <div className="mb-16">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-3">
+            {siteTitle}
+          </h1>
+          <p className="text-base text-gray-600 dark:text-gray-400 leading-relaxed">
             {siteDescription}
           </p>
-        </section>
+        </div>
 
-        <section>
-          <h2 className="mb-6 text-2xl font-bold text-gray-900 dark:text-gray-100">
-            최신 포스트
-          </h2>
-
-          {apiError ? (
-            <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-6 dark:border-yellow-800 dark:bg-yellow-900/20">
-              <p className="text-yellow-800 dark:text-yellow-200 font-semibold">
-                ⚠️ API 서버 연결 실패
-              </p>
-              <p className="mt-2 text-sm text-yellow-700 dark:text-yellow-300">
-                {apiError}
-              </p>
+        {apiError ? (
+          <div className="rounded border border-amber-200 bg-amber-50 px-6 py-4 dark:border-amber-900/50 dark:bg-amber-900/20">
+            <p className="text-sm font-medium text-amber-900 dark:text-amber-200">
+              API 서버 연결 실패
+            </p>
+            <p className="mt-1 text-sm text-amber-800 dark:text-amber-300">
+              {apiError}
+            </p>
+          </div>
+        ) : posts.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-gray-500 dark:text-gray-400">
+              아직 작성된 포스트가 없습니다.
+            </p>
+          </div>
+        ) : (
+          <>
+            <div className="space-y-0">
+              {posts.map((post) => (
+                <PostCard key={post.id} post={post} />
+              ))}
             </div>
-          ) : posts.length === 0 ? (
-            <div className="rounded-lg border border-gray-200 bg-white p-12 text-center dark:border-gray-800 dark:bg-gray-900">
-              <p className="text-gray-600 dark:text-gray-400">
-                아직 작성된 포스트가 없습니다.
-              </p>
-            </div>
-          ) : (
-            <>
-              <div className="grid gap-6 md:grid-cols-2">
-                {posts.map((post) => (
-                  <PostCard key={post.id} post={post} />
-                ))}
+            {posts.length >= 6 && (
+              <div className="mt-16 text-center">
+                <Link
+                  to="/posts"
+                  className="inline-block text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 border-b border-gray-300 hover:border-gray-600 dark:border-gray-700 dark:hover:border-gray-400 pb-1"
+                >
+                  모든 포스트 보기 →
+                </Link>
               </div>
-              {posts.length >= 6 && (
-                <div className="mt-8 text-center">
-                  <Link
-                    to="/posts"
-                    className="inline-block rounded-lg bg-gray-900 px-6 py-3 text-white transition-colors hover:bg-gray-800 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-200"
-                  >
-                    모든 포스트 보기
-                  </Link>
-                </div>
-              )}
-            </>
-          )}
-        </section>
+            )}
+          </>
+        )}
       </main>
     </>
   );

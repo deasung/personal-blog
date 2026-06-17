@@ -5,7 +5,9 @@ export function getApiBaseUrl(): string {
   const url =
     process.env.NEXT_PUBLIC_API_URL ||
     DEFAULT_API_BASE_URL;
-  return String(url).replace(/\/+$/, "");
+  const baseUrl = String(url).replace(/\/+$/, "");
+  console.log("🔗 API Base URL:", baseUrl);
+  return baseUrl;
 }
 
 interface ApiResponse<T> {

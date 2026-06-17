@@ -1,22 +1,6 @@
 import type { AppProps } from "next/app";
-import { BrowserRouter } from "react-router-dom";
-import { useEffect, useState } from "react";
 import "@/styles/globals.css";
 
 export default function App({ Component, pageProps }: AppProps) {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) {
-    return null;
-  }
-
-  return (
-    <BrowserRouter>
-      <Component {...pageProps} />
-    </BrowserRouter>
-  );
+  return <Component {...pageProps} />;
 }

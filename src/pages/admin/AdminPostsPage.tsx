@@ -70,10 +70,13 @@ export default function AdminPostsPage() {
     setLoading(true);
     setError("");
     try {
+      console.log("📝 Fetching posts...");
       const res = await api.getPosts({ published: filterPublished, limit: 50 });
+      console.log("✅ Posts fetched:", res);
       if (res.success && res.data) setPosts(res.data);
       else setError(res.message || "포스트를 불러올 수 없습니다.");
     } catch (e) {
+      console.error("❌ Error fetching posts:", e);
       setError(e instanceof Error ? e.message : "포스트를 불러오는 중 오류");
     } finally {
       setLoading(false);
