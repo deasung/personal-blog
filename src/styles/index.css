@@ -1,0 +1,115 @@
+@import "tailwindcss";
+@import "highlight.js/styles/github-dark.css";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+pre {
+  @apply rounded-lg bg-gray-100 p-4 overflow-x-auto dark:bg-gray-800;
+}
+
+code {
+  @apply rounded bg-gray-100 px-1 py-0.5 text-sm dark:bg-gray-800;
+}
+
+pre code {
+  @apply bg-transparent p-0;
+}
+
+.ProseMirror ul {
+  list-style-type: disc;
+  padding-left: 1.25rem;
+}
+
+.ProseMirror ol {
+  list-style-type: decimal;
+  padding-left: 1.25rem;
+}
+
+.ProseMirror li {
+  margin: 0.25rem 0;
+}
+
+/* Tiptap TaskList 스타일 */
+.ProseMirror ul[data-type="taskList"] {
+  list-style: none;
+  padding-left: 0.5rem;
+}
+
+.ProseMirror li[data-type="taskItem"] {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.ProseMirror li[data-type="taskItem"] > label {
+  margin-top: 0.1rem;
+}
+
+.ProseMirror li[data-type="taskItem"] > div {
+  flex: 1;
+}
+
+.ProseMirror h1,
+.ProseMirror h2,
+.ProseMirror h3,
+.ProseMirror h4 {
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 1.1em 0 0.6em;
+}
+
+.ProseMirror h1 {
+  font-size: 2rem;
+}
+.ProseMirror h2 {
+  font-size: 1.75rem;
+}
+.ProseMirror h3 {
+  font-size: 1.5rem;
+}
+.ProseMirror h4 {
+  font-size: 1.25rem;
+}
+
+.ProseMirror p {
+  margin: 0.75em 0;
+}
+
+pre code.hljs {
+  @apply bg-transparent p-0;
+  display: block;
+  overflow-x: auto;
+  padding: 1em;
+}
+
+code.hljs {
+  @apply bg-transparent p-0;
+}
+
+.hljs {
+  @apply bg-gray-100 dark:bg-gray-800;
+  color: #333;
+}
+
+@media (prefers-color-scheme: dark) {
+  .hljs {
+    color: #e0e0e0;
+  }
+}
+
