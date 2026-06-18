@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
+import type { MouseEvent } from "react";
 
 export interface PostCardData {
   id: number;
@@ -25,7 +26,7 @@ export default function PostCard({ post }: { post: PostCardData }) {
             {post.categorySlug && (
               <Link
                 to={`/categories/${post.categorySlug}`}
-                onClick={(e) => e.stopPropagation()}
+                onClick={(e: MouseEvent<HTMLAnchorElement>) => e.stopPropagation()}
                 className="inline-block text-xs font-semibold text-gray-500 uppercase tracking-wide hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
               >
                 {post.categorySlug}
